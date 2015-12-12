@@ -1,11 +1,22 @@
 package com.coolweather.app.util;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.coolweather.app.db.CoolWeatherDB;
 import com.coolweather.app.model.City;
 import com.coolweather.app.model.County;
 import com.coolweather.app.model.Province;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Zack on 2015/11/1.
@@ -63,5 +74,35 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    public static void handleWeatherResponse(Context context, String response,String cityName){
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject data = jsonObject.getJSONObject("data");
+            String forecast = data.getString("forecast");
+            JSONArray jsonArray = new JSONArray(forecast);
+            JSONObject weatherInfo = jsonArray.getJSONObject(0);
+            String temp1 = weatherInfo.getString("high");
+            String temp2 = weatherInfo.getString("low");
+            String weatherDesp = weatherInfo.getString("type");
+            String date = weatherInfo.getString("date");
+            saveWeatherInfo(context,cityName,temp1,temp2,weatherDesp,date);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveWeatherInfo(Context context,String cityName,String temp1,String temp2,String weatherDesp,String date){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putBoolean("city_selected",true);
+        editor.putString("city_name", cityName);
+        editor.putString("temp1", temp1);
+        editor.putString("temp2", temp2);
+        editor.putString("weather_desp", weatherDesp);
+        editor.putString("date",date);
+        editor.putString("current_date",simpleDateFormat.format(new Date()));
+        editor.commit();
     }
 }
