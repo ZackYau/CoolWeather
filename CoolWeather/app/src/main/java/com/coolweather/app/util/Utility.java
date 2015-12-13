@@ -76,7 +76,7 @@ public class Utility {
         return false;
     }
 
-    public static void handleWeatherResponse(Context context, String response,String cityName){
+    public static void handleWeatherResponse(Context context, String response,String cityName,String weatherCode){
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONObject data = jsonObject.getJSONObject("data");
@@ -87,13 +87,13 @@ public class Utility {
             String temp2 = weatherInfo.getString("low");
             String weatherDesp = weatherInfo.getString("type");
             String date = weatherInfo.getString("date");
-            saveWeatherInfo(context,cityName,temp1,temp2,weatherDesp,date);
+            saveWeatherInfo(context,cityName,temp1,temp2,weatherDesp,date,weatherCode);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public static void saveWeatherInfo(Context context,String cityName,String temp1,String temp2,String weatherDesp,String date){
+    public static void saveWeatherInfo(Context context,String cityName,String temp1,String temp2,String weatherDesp,String date,String weatherCode){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected",true);
@@ -103,6 +103,7 @@ public class Utility {
         editor.putString("weather_desp", weatherDesp);
         editor.putString("date",date);
         editor.putString("current_date",simpleDateFormat.format(new Date()));
+        editor.putString("weather_code",weatherCode);
         editor.commit();
     }
 }
